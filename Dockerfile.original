@@ -1,0 +1,37 @@
+FROM circleci/golang:latest
+
+USER root
+
+# Copy source code
+COPY . /opt
+
+WORKDIR /opt/code
+
+RUN apt-get update
+
+# extra tools
+RUN apt-get install -y perl vim
+
+# app dependencies
+RUN apt-get install -y gcc
+
+# Define environment variables needed for building and running the app
+ENV MY_VAR=1
+ENV MY_CONF=/etc/myconf
+
+ARG MyCustomEnv=foo
+
+ENV MY_CUSTOM_ENV=${MyCustomEnv}
+RUN echo ${MY_CUSTOM_ENV}
+
+# Set image metadata
+LABEL ch.docker.event="Image Optimization Workshop"
+
+# Inform which port the app will use
+EXPOSE 8080
+
+# Build the executable
+RUN go mod tidy
+RUN go build
+
+ENTRYPOINT ["./meetup"]
