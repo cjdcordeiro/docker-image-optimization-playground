@@ -11,7 +11,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	log.Info("Docker CH Meetup: starting web app")
+	log.Info("Docker CH Meetup: starting web app!")
 
 	http.HandleFunc("/", rootHandler)
 	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))

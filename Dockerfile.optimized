@@ -1,0 +1,39 @@
+FROM golang:alpine3.14 as builder
+
+RUN apk update && apk add --no-cache gcc musl-dev && \
+        rm -fr /var/cache/apk/*
+
+ARG MyCustomEnv=foo
+
+ENV MY_CUSTOM_ENV=${MyCustomEnv}
+RUN echo ${MY_CUSTOM_ENV}
+
+# Copy source code
+COPY code /opt
+
+WORKDIR /opt
+
+# Build the executable
+RUN go mod tidy && CGO_ENABLED=0 go build -ldflags="-w -s"
+
+
+################
+FROM scratch
+
+# Set image metadata
+LABEL ch.docker.event="Image Optimization Workshop"
+
+# Define environment variables needed for building and running the app
+ENV MY_VAR=1 MY_CONF=/etc/myconf
+
+# Inform which port the app will use
+EXPOSE 8080
+
+COPY --from=builder /opt /opt
+
+WORKDIR /opt
+ENTRYPOINT ["./meetup"]
+
+
+
+
